@@ -63,7 +63,7 @@ TEST(CleanToken, OneLetter) {
 #pragma region GatherTokenTests
 
 // Text with leading spaces
-TEST(GatherTokens, Colors) {
+TEST(GatherTokens, LeadingSpaces) {
   string text = "          one two three";
   set<string> expected = {"one", "two", "three"};
 
@@ -72,7 +72,7 @@ TEST(GatherTokens, Colors) {
 }
 
 // Text with trailing spaces
-TEST(GatherTokens, Colors) {
+TEST(GatherTokens, TrailingSpaces) {
   string text = "one two three           ";
   set<string> expected = {"one", "two", "three"};
 
@@ -81,7 +81,7 @@ TEST(GatherTokens, Colors) {
 }
 
 // Text with multiple spaces between words
-TEST(GatherTokens, Colors) {
+TEST(GatherTokens, SpacesBetween) {
   string text = "one       two         three";
   set<string> expected = {"one", "two", "three"};
 

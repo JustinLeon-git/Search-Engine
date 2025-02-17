@@ -67,13 +67,35 @@ string cleanToken(const string& token) {
       newToken.push_back(token.at(i));
     }
   }
-  
+
   return newToken;
 }
 
 set<string> gatherTokens(const string& text) {
-  // TODO student
-  return {};
+  // Empty text
+  set<string> tokenSet;
+  if (!text.size()) {
+    return tokenSet;
+  }
+
+  size_t subStart, curr = 0;
+  while (curr < text.size()) {
+    // Traversing garbage
+    if (!isalpha(text.at(curr))) {
+      curr++;
+      continue;
+    // We encounter a token
+    } else {
+      subStart = curr;
+      // Traversing token
+      while (curr < text.size() && !isspace(text.at(curr))) {
+        curr++;
+      }
+      // Put token in set
+      tokenSet.insert(cleanToken(text.substr(subStart, curr - subStart)));
+    }
+  }
+  return tokenSet;
 }
 
 int buildIndex(const string& filename, map<string, set<string>>& index) {
