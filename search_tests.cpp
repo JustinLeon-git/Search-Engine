@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -56,8 +57,6 @@ TEST(CleanToken, OneLetter) {
   ASSERT_THAT(cleanToken("Z"), StrEq("z"));
 }
 
-// 
-
 #pragma endregion CleanTokenTests
 
 #pragma region GatherTokenTests
@@ -90,3 +89,57 @@ TEST(GatherTokens, SpacesBetween) {
 }
 
 #pragma endregion GatherTokenTests
+
+#pragma region BuildIndexTests
+
+// Testing invalid filenames
+TEST(BuildIndex, InvalidFilename) {
+  string filename = "data/bogus.txt";
+  map<string, set<string>> index;
+  ASSERT_FALSE(filesystem::exists(filename))
+    << "Filename of " + filename + " actually exists when it shouldn't";
+  int websiteCount = buildIndex(filename, index);
+  EXPECT_TRUE(index.empty())
+    << "Index is not empty with invalid filename";
+  EXPECT_THAT(websiteCount, Eq(0))
+    << "Website count equal to " + to_string(websiteCount) + " not 0 with invalid filename";
+}
+
+// Checking with tiny.txt for valid build of index
+TEST(BuildIndex, Tiny) {
+  string filename = "data/tiny.txt";
+  map<string, set<string>> expectedIndex = {
+      {"eggs", {"www.shoppinglist.com"}},
+      {"milk", {"www.shoppinglist.com"}},
+      {"fish", {"www.shoppinglist.com", "www.dr.seuss.net"}},
+      {"bread", {"www.shoppinglist.com"}},
+      {"cheese", {"www.shoppinglist.com"}},
+      {"red", {"www.rainbow.org", "www.dr.seuss.net"}},
+      {"gre-en", {"www.rainbow.org"}},
+      {"orange", {"www.rainbow.org"}},
+      {"yellow", {"www.rainbow.org"}},
+      {"blue", {"www.rainbow.org", "www.dr.seuss.net"}},
+      {"indigo", {"www.rainbow.org"}},
+      {"violet", {"www.rainbow.org"}},
+      {"one", {"www.dr.seuss.net"}},
+      {"two", {"www.dr.seuss.net"}},
+      {"i'm", {"www.bigbadwolf.com"}},
+      {"not", {"www.bigbadwolf.com"}},
+      {"trying", {"www.bigbadwolf.com"}},
+      {"to", {"www.bigbadwolf.com"}},
+      {"eat", {"www.bigbadwolf.com"}},
+      {"you", {"www.bigbadwolf.com"}},
+  };
+  map<string, set<string>> studentIndex;
+  int studentNumProcesed = buildIndex(filename, studentIndex);
+
+  string indexTestFeedback =
+      "buildIndex(\"" + filename + "\", ...) index incorrect\n";
+  EXPECT_THAT(studentIndex, ContainerEq(expectedIndex)) << indexTestFeedback;
+
+  string retTestFeedback =
+      "buildIndex(\"" + filename + "\", ...) return value incorrect\n";
+  EXPECT_THAT(studentNumProcesed, Eq(4)) << retTestFeedback;
+}
+
+#pragma endregion BuildIndexTests
