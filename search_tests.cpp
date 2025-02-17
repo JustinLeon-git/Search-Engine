@@ -19,21 +19,31 @@ TEST(CleanToken, PrefixAndSuffixCleaning) {
 }
 
 // Tokens with punctuation in the middle, as well as possibly at the ends
-TEST(CleanToken, MiddleAndSuffixCleaning) {
-  ASSERT_THAT(cleanToken("HE..LLO"), StrEq("hello"));
-  ASSERT_THAT(cleanToken("he...Llo..."), StrEq("hello"));
-  ASSERT_THAT(cleanToken("h.e.l.l.O.\"!?"), StrEq("hello"));
-  ASSERT_THAT(cleanToken("H.E.L.L.O"), StrEq("hello"));
-  ASSERT_THAT(cleanToken("Hell.o,,,"), StrEq("hello"));
-  ASSERT_THAT(cleanToken("he.\"!?LL.\"!?o.\"!?"), StrEq("hello"));
+TEST(CleanToken, MiddlePunctAndEndCleaning) {
+  ASSERT_THAT(cleanToken("HE..LLO"), StrEq("he..llo"));
+  ASSERT_THAT(cleanToken("he...Llo..."), StrEq("he...llo"));
+  ASSERT_THAT(cleanToken("h.e.l.l.O.\"!?"), StrEq("h.e.l.l.o"));
+  ASSERT_THAT(cleanToken("H.E.L.L.O"), StrEq("h.e.l.l.o"));
+  ASSERT_THAT(cleanToken("Hell.o,,,"), StrEq("hell.o"));
+  ASSERT_THAT(cleanToken("he.\"!?LL.\"!?o.\"!?"), StrEq("he.\"!?ll.\"!?o"));
+}
+
+// Tokens with punctuation in the middle, as well as possibly at the beginning
+TEST(CleanToken, MiddlePunctAndBeginningCleaning) {
+  ASSERT_THAT(cleanToken("HE..LLO"), StrEq("he..llo"));
+  ASSERT_THAT(cleanToken("...he...Llo"), StrEq("he...llo"));
+  ASSERT_THAT(cleanToken(".\"!?h.e.l.l.O"), StrEq("h.e.l.l.o"));
+  ASSERT_THAT(cleanToken(".H.E.L.L.O"), StrEq("h.e.l.l.o"));
+  ASSERT_THAT(cleanToken("Hell.o"), StrEq("hell.o"));
+  ASSERT_THAT(cleanToken("\"!?.he.\"!?LL.\"!?o"), StrEq("he.\"!?ll.\"!?o"));
 }
 
 // Tokens with numbers at the end
 TEST(CleanToken, NumAtEnd) {
-  ASSERT_THAT(cleanToken("HELLO1"), StrEq("hello"));
-  ASSERT_THAT(cleanToken("heLlo123"), StrEq("hello"));
-  ASSERT_THAT(cleanToken("hellO0"), StrEq("hello"));
-  ASSERT_THAT(cleanToken("hellO011223344"), StrEq("hello"));
+  ASSERT_THAT(cleanToken("HELLO1"), StrEq("hello1"));
+  ASSERT_THAT(cleanToken("heLlo123"), StrEq("hello123"));
+  ASSERT_THAT(cleanToken("hellO0"), StrEq("hello0"));
+  ASSERT_THAT(cleanToken("hellO011223344"), StrEq("hello011223344"));
 }
 
 // Tokens that are 1 letter long
@@ -41,9 +51,9 @@ TEST(CleanToken, OneLetter) {
   ASSERT_THAT(cleanToken("x"), StrEq("x"));
   ASSERT_THAT(cleanToken("y"), StrEq("y"));
   ASSERT_THAT(cleanToken("z"), StrEq("z"));
-  ASSERT_THAT(cleanToken("X"), StrEq("X"));
-  ASSERT_THAT(cleanToken("Y"), StrEq("Y"));
-  ASSERT_THAT(cleanToken("Z"), StrEq("Z"));
+  ASSERT_THAT(cleanToken("X"), StrEq("x"));
+  ASSERT_THAT(cleanToken("Y"), StrEq("y"));
+  ASSERT_THAT(cleanToken("Z"), StrEq("z"));
 }
 
 #pragma endregion CleanTokenTests
