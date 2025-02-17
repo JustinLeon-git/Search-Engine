@@ -1,5 +1,6 @@
 #include "include/search.h"
 
+#include <filesystem>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -83,7 +84,6 @@ set<string> gatherTokens(const string& text) {
     // Traversing garbage
     if (!isalpha(text.at(curr))) {
       curr++;
-      continue;
     // We encounter a token
     } else {
       subStart = curr;
@@ -99,8 +99,34 @@ set<string> gatherTokens(const string& text) {
 }
 
 int buildIndex(const string& filename, map<string, set<string>>& index) {
-  // TODO student
-  return 0;
+  if (!filesystem::exists(filename)) {
+    return 0;
+  }
+
+  ifstream file(filename);
+  int websites = 0;
+  
+  // Now we traverse the file
+  bool websiteFlag = true;
+  string line, currWebsite;
+  while (getline(file, line)) {
+    // Processing website
+    if (websiteFlag) {
+      currWebsite = line;
+      websites++;
+      websiteFlag = false;
+    // Processing website text
+    } else {
+      set<string> tokens = gatherTokens(line);
+      // Looping through every word
+      for (string token : tokens) {
+        index[token].insert(currWebsite);
+      }
+      websiteFlag = true;
+    }
+  }
+
+  return websites;
 }
 
 set<string> findQueryMatches(const map<string, set<string>>& index,
