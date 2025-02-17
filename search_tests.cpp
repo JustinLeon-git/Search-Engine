@@ -60,3 +60,33 @@ TEST(CleanToken, OneLetter) {
 
 #pragma endregion CleanTokenTests
 
+#pragma region GatherTokenTests
+
+// Text with leading spaces
+TEST(GatherTokens, Colors) {
+  string text = "          one two three";
+  set<string> expected = {"one", "two", "three"};
+
+  EXPECT_THAT(gatherTokens(text), ContainerEq(expected))
+      << "text=\"" << text << "\"";
+}
+
+// Text with trailing spaces
+TEST(GatherTokens, Colors) {
+  string text = "one two three           ";
+  set<string> expected = {"one", "two", "three"};
+
+  EXPECT_THAT(gatherTokens(text), ContainerEq(expected))
+      << "text=\"" << text << "\"";
+}
+
+// Text with multiple spaces between words
+TEST(GatherTokens, Colors) {
+  string text = "one       two         three";
+  set<string> expected = {"one", "two", "three"};
+
+  EXPECT_THAT(gatherTokens(text), ContainerEq(expected))
+      << "text=\"" << text << "\"";
+}
+
+#pragma endregion GatherTokenTests
