@@ -129,17 +129,16 @@ int buildIndex(const string& filename, map<string, set<string>>& index) {
   return websites;
 }
 
-set<string> findQueryMatches(const map<string, set<string>>& index,
-                             const string& sentence) {
+set<string> findQueryMatches(const map<string, set<string>>& index, const string& sentence) {
   set<string> runSet, opSet, resSet;
   string key;
   size_t start = 0;
   size_t curr = 0;
   char op = '\0';
   // Traversing through sentence
-  while (curr < sentence.size()) {
+  while (curr <= sentence.size()) {
     // Found a full string
-    if (isspace(sentence.at(curr))) {
+    if (curr == sentence.size() || isspace(sentence.at(curr))) {
       key = sentence.substr(start, curr - start);
       // Checking if we have an op
       if (key.at(0) == '+' || key.at(0) == '-') {
@@ -172,32 +171,6 @@ set<string> findQueryMatches(const map<string, set<string>>& index,
     // Traversing through a word
     curr++;
   }
-  // Now we can just run it back for the last key
-  curr ++;
-  key = sentence.substr(start, curr - start);
-  // Checking if we have an op
-  if (key.at(0) == '+' || key.at(0) == '-') {
-    op = key.at(0);
-    key.erase(0, 1);
-  }
-  key = cleanToken(key);
-
-  // Determining the set we're operating on
-  if (index.contains(key)) {
-    opSet = index.at(key);
-  } else {
-    opSet.clear();
-  }
-
-  // Now we perform the given operation
-  if (op == '+') {
-    set_intersection(runSet.begin(), runSet.end(), opSet.begin(), opSet.end(), inserter(resSet, resSet.end()));
-  } else if (op == '-') {
-    set_difference(runSet.begin(), runSet.end(), opSet.begin(), opSet.end(), inserter(resSet, resSet.end()));
-  } else {
-    set_union(runSet.begin(), runSet.end(), opSet.begin(), opSet.end(), inserter(resSet, resSet.end()));
-  }
-  runSet = resSet;
 
   return runSet;
 }
