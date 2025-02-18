@@ -143,3 +143,46 @@ TEST(BuildIndex, Tiny) {
 }
 
 #pragma endregion BuildIndexTests
+
+#pragma region FindQueryMatches
+
+map<string, set<string>> INDEX = {
+  {"hello", {"example.com", "uic.edu"}},
+  {"there", {"example.com"}},
+  {"according", {"uic.edu"}},
+  {"to", {"uic.edu"}},
+  {"all", {"example.com", "uic.edu", "random.org"}},
+  {"known", {"uic.edu"}},
+  {"laws", {"random.org"}},
+  {"of", {"random.org"}},
+  {"aviation", {"random.org"}},
+  {"a", {"uic.edu", "random.org"}},
+};
+
+// First query term isn't in the index
+TEST(FindQueryMatches, FirstTermMissing) {
+  set<string> expected;
+  
+  expected = {"example.com"};
+  EXPECT_THAT(findQueryMatches(INDEX, "bingo there"), ContainerEq(expected));
+
+  expected = {};
+  EXPECT_THAT(findQueryMatches(INDEX, "bongo -hello"), ContainerEq(expected));
+  EXPECT_THAT(findQueryMatches(INDEX, "bango +Hello!"), ContainerEq(expected));
+}
+
+// Later query term not in index
+TEST(FindQueryMatches, LaterTermMissing) {
+  set<string> expected;
+  
+  expected = {"example.com", "uic.edu", "random.org"};
+  EXPECT_THAT(findQueryMatches(INDEX, "all bingo"), ContainerEq(expected));
+  EXPECT_THAT(findQueryMatches(INDEX, "all -bango"), ContainerEq(expected));
+
+  expected = {};
+  EXPECT_THAT(findQueryMatches(INDEX, "all, +bongo"), ContainerEq(expected));
+}
+
+
+
+#pragma endregion FindQueryMatches
