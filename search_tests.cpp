@@ -183,6 +183,4 @@ TEST(FindQueryMatches, LaterTermMissing) {
   EXPECT_THAT(findQueryMatches(INDEX, "all, +bongo"), ContainerEq(expected));
 }
 
-
-
 #pragma endregion FindQueryMatches

@@ -12,87 +12,57 @@
 
 using namespace std;
 
-string cleanToken(const string& token) {
-  // Checking for empty tokens
+string cleanToken(const string &token) {
   if (token.empty()) {
     return "";
   }
 
-  // Checking for letter in token
+  int start = 0;
+  int end = token.size() - 1;
+
+  // Remove punctuation from the beginning.
+  while (start < token.size() && ispunct(token[start])) {
+    start++;
+  }
+  // Remove punctuation from the end.
+  while (end >= start && ispunct(token[end])) {
+    end--;
+  }
+  if (start > end) {
+    return "";
+  }
+
+  // Check that there is at least one alphabetic character.
   bool hasLetter = false;
-  for (char c : token) {
-    if (isalpha(c)) {
-        hasLetter = true;
-        break;
+  for (int i = start; i <= end; i++) {
+    if (isalpha(token[i])) {
+      hasLetter = true;
+      break;
     }
   }
   if (!hasLetter) {
     return "";
   }
 
-  // Finding first letter
-  size_t firstLetter;
-  for (size_t i = 0; i < token.size(); i++) {
-    if (isalpha(token.at(i))) {
-      firstLetter = i;
-      break;
-    }
+  string result;
+  for (int i = start; i <= end; i++) {
+    result.push_back(tolower(token[i]));
   }
-  // Finding last letter
-  size_t lastLetter;
-  for (size_t i = token.size() - 1; i >= 0; i--) {
-    if (isalpha(token.at(i))) {
-      lastLetter = i;
-      break;
-    }
-  }
-
-  string newToken;
-  // Cleansing Prefix
-  for (size_t i = 0; i < firstLetter; i++) {
-    if (!ispunct(token.at(i))) {
-      newToken.push_back(token.at(i));
-    }
-  }
-  // Cleansing middle
-  for (size_t i = firstLetter; i <= lastLetter; i++) {
-    if (isalpha(token.at(i))) {
-      newToken.push_back(tolower(token.at(i)));
-    } else {
-      newToken.push_back(token.at(i));
-    }
-  }
-  // Cleansing suffix
-  for (size_t i = lastLetter + 1; i < token.size(); i++) {
-    if (!ispunct(token.at(i))) {
-      newToken.push_back(token.at(i));
-    }
-  }
-
-  return newToken;
+  return result;
 }
 
 set<string> gatherTokens(const string& text) {
-  // Empty text
   set<string> tokenSet;
-  if (!text.size()) {
+  if (text.empty()) {
     return tokenSet;
   }
-
-  size_t subStart, curr = 0;
-  while (curr < text.size()) {
-    // Traversing garbage
-    if (!isalpha(text.at(curr))) {
-      curr++;
-    // We encounter a token
-    } else {
-      subStart = curr;
-      // Traversing token
-      while (curr < text.size() && !isspace(text.at(curr))) {
-        curr++;
-      }
-      // Put token in set
-      tokenSet.insert(cleanToken(text.substr(subStart, curr - subStart)));
+  
+  istringstream stream(text);
+  string token;
+  while (stream >> token) {
+    string cleaned = cleanToken(token);
+    if (!cleaned.empty()) {
+      tokenSet.insert(cleaned);
     }
   }
   return tokenSet;
@@ -176,5 +146,44 @@ set<string> findQueryMatches(const map<string, set<string>>& index, const string
 }
 
 void searchEngine(const string& filename) {
-  // TODO student
+  map<string, set<string>> index;
+  
+  // If the file doesn't exist, print the error.
+  if (!filesystem::exists(filename)) {
+    cout << "Invalid filename." << "\n";
+  }
+  
+  cout << "Stand by while building index..." << "\n";
+  int pages = buildIndex(filename, index);
+  cout << "Indexed " << pages << " pages containing " << index.size() << " unique terms" << "\n";
+  
+  string input;
+  while (true) {
+    // Print the prompt WITHOUT a newline for the tests
+    cout << "Enter query sentence (press enter to quit): ";
+    if (!getline(cin, input))
+      break;
+      
+    // Trim off the leading and trailing whitespace.
+    size_t start = input.find_first_not_of(" \t\r\n");
+    if (start == string::npos)
+      input = "";
+    else {
+      size_t end = input.find_last_not_of(" \t\r\n");
+      input = input.substr(start, end - start + 1);
+    }
+    
+    // If the query is empty, print the exit message on the same line and break.
+    if (input.empty()) {
+      cout << "Thank you for searching!";
+      break;
+    }
+    
+    // Process the query.
+    set<string> matches = findQueryMatches(index, input);
+    cout << "Found " << matches.size() << " matching pages" << "\n";
+    for (const string &page : matches) {
+      cout << page << "\n";
+    }
+  }
 }
