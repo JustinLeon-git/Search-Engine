@@ -1,0 +1,2 @@
+## Overview
+A small C++ program that uses algorithms and data structures designed for search engines to grab keywords from websites and allow the user to search, giving the program search terms to find the most relevant websites. Designed and implemented unit testing using Google Test for every function to verify the program's efficacy more accurately. In addition, makefile was used to compile different test suites automatically for more accessible testing during the creation of the project.
